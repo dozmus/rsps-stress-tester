@@ -16,11 +16,14 @@ repositories {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/com.beust/jcommander
+    compile group: 'com.beust', name: 'jcommander', version: '1.72'
     // https://mvnrepository.com/artifact/io.netty/netty-all
     compile 'io.netty:netty-all:4.1.29.Final'
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
     compile 'org.slf4j:slf4j-simple:1.7.25'
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
     runtimeClasspath 'org.slf4j:slf4j-api:1.7.25'
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    // https://mvnrepository.com/artifact/junit/junit
+    testCompile 'junit:junit:4.12'
 }

@@ -29,7 +29,7 @@ public class BotClientHandler317 extends ChannelInboundHandlerAdapter {
     }
 
     public void channelActive(ChannelHandlerContext ctx) {
-        LOGGER.info("Connection opened.");
+        LOGGER.info("{}: Connection opened.", name);
 
         // Write login initiation data
         if (state == LoginState.PENDING_CONNECTION) {
@@ -44,7 +44,7 @@ public class BotClientHandler317 extends ChannelInboundHandlerAdapter {
     }
 
     public void channelInactive(ChannelHandlerContext ctx) {
-        LOGGER.info("Connection lost.");
+        LOGGER.info("{}: Connection lost.", name);
         setState(LoginState.PENDING_CONNECTION);
         reconnecting = true;
 
@@ -57,7 +57,6 @@ public class BotClientHandler317 extends ChannelInboundHandlerAdapter {
 
         if (getState() == LoginState.WAITING_FOR_JUNK) {
             if (buf.readableBytes() >= 8) {
-                LOGGER.info("state={}", state);
                 buf.readBytes(8);
                 setState(LoginState.WAITING_FOR_RESPONSE_CODE);
             }
@@ -66,14 +65,13 @@ public class BotClientHandler317 extends ChannelInboundHandlerAdapter {
         if (getState() == LoginState.WAITING_FOR_RESPONSE_CODE) {
             if (buf.readableBytes() >= 1) {
                 int responseCode = buf.readByte();
-                LOGGER.info("state={}", state);
 
                 if (responseCode != 0) {
-                    LOGGER.info("Bad response code: {}", responseCode);
+                    LOGGER.info("{}: Bad response code: {}", name, responseCode);
                     setState(LoginState.DISCONNECTED);
                     return;
                 } else {
-                    LOGGER.info("Response code: {}", responseCode);
+                    LOGGER.info("{}: Response code: {}", name, responseCode);
                 }
 
                 // generate csk,ssk pair
@@ -123,7 +121,6 @@ public class BotClientHandler317 extends ChannelInboundHandlerAdapter {
         }
 
         if (getState() == LoginState.WAITING_FOR_LOGIN_RESPONSE) {
-            LOGGER.info("state={}", state);
             if (buf.readableBytes() > 3) {
                 int resp = buf.readByte();
 
@@ -137,16 +134,11 @@ public class BotClientHandler317 extends ChannelInboundHandlerAdapter {
                 }
             }
         }
-
-        if (getState() == LoginState.CONNECTED) {
-            ctx.writeAndFlush(idlePacket());
-        }
         buf.release();
     }
 
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
         if (evt instanceof IdleStateEvent && getState() == LoginState.CONNECTED) {
-            LOGGER.info("Idle event");
             ctx.writeAndFlush(idlePacket());
         }
     }

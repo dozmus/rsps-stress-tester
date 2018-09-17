@@ -9,7 +9,7 @@ import java.util.Random;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
-public class ReconnectTask implements Runnable, ChannelFutureListener {
+public final class ReconnectTask implements Runnable, ChannelFutureListener {
 
     // Source: https://stackoverflow.com/a/36422221
 

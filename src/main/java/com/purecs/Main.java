@@ -1,18 +1,37 @@
 package com.purecs;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.ParameterException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Main {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
     public static void main(String[] args) throws InterruptedException {
-        String host = "127.0.0.1";
-        int port = 43594;
-        BotClient client = new BotClient();
-        int n = 1;
-        int chunks = 10;
+        // Parse command-line arguments
+        BotClientContext ctx = new BotClientContext();
 
-        for (int i = 1; i <= n; i++) {
-            client.connect(host, port, "Bot" + i);
+        try {
+            JCommander commander = JCommander.newBuilder()
+                    .addObject(ctx)
+                    .programName("java -jar rsps-stress-tester.jar")
+                    .build();
+            commander.parse(args);
+        } catch (ParameterException ex) {
+            LOGGER.error("Unable to parse command-line arguments: {}", ex.getMessage());
+            System.exit(1);
+        }
 
-            if (i % chunks == 0) {
+        // Create clients
+        BotClientHive hive = new BotClientHive(ctx.getHost(), ctx.getPort(), ctx.getThreads());
+        final int chunk = 10;
+
+        for (int i = 1; i <= ctx.getNumber(); i++) {
+            hive.connect("Bot" + i);
+
+            if (i % chunk == 0) {
                 Thread.sleep(1000);
             }
         }
