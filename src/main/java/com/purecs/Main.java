@@ -25,7 +25,7 @@ public class Main {
         }
 
         // Create clients
-        BotClientHive hive = new BotClientHive(ctx.getHost(), ctx.getPort(), ctx.getThreads());
+        BotClientHive hive = new BotClientHive(ctx.getHost(), ctx.getPort(), ctx.getThreads(), ctx.getMessages());
         final int chunk = 10;
 
         for (int i = 1; i <= ctx.getNumber(); i++) {

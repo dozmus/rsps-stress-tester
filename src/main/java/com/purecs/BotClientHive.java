@@ -8,15 +8,19 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.util.List;
+
 public class BotClientHive {
 
     private final Bootstrap bootstrap = new Bootstrap();
     private final String host;
     private final int port;
+    private final List<String> messages;
 
-    public BotClientHive(String host, int port, int threads) {
+    public BotClientHive(String host, int port, int threads, List<String> messages) {
         this.host = host;
         this.port = port;
+        this.messages = messages;
         EventLoopGroup workerGroup = new NioEventLoopGroup(threads);
         bootstrap.group(workerGroup)
                 .channel(NioSocketChannel.class)
@@ -29,7 +33,7 @@ public class BotClientHive {
         bootstrap.handler(new ChannelInitializer<SocketChannel>() {
                 public void initChannel(SocketChannel ch) {
                     ch.pipeline().addLast(new IdleHandler());
-                    ch.pipeline().addLast(new BotClientHandler317(username, bootstrap));
+                    ch.pipeline().addLast(new BotClientHandler317(username, messages, bootstrap));
                     // https://stackoverflow.com/questions/7895964/how-does-the-netty-threading-model-work-in-the-case-of-many-client-connections/7905761#7905761
                 }
             });

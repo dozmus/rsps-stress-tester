@@ -16,5 +16,9 @@ public abstract class BotClientHandler extends ChannelInboundHandlerAdapter {
 
     public abstract ByteBuf idlePacket();
 
-    public abstract ByteBuf chatPacket(int effects, int color, String text);
+    public ByteBuf chatPacket(String text) {
+        return chatPacket(text, 0, 0);
+    }
+
+    public abstract ByteBuf chatPacket(String text, int effects, int color);
 }

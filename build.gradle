@@ -27,3 +27,9 @@ dependencies {
     // https://mvnrepository.com/artifact/junit/junit
     testCompile 'junit:junit:4.12'
 }
+
+run {
+    if (project.hasProperty("jargs")) {
+        args(jargs.split(' '))
+    }
+}

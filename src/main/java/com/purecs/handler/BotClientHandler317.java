@@ -7,24 +7,28 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BotClientHandler317 extends ChannelInboundHandlerAdapter {
+import java.util.List;
+
+public class BotClientHandler317 extends BotClientHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BotClientHandler317.class);
     private static final int RESPONSE_OK = 2;
-    private String name;
-    private Bootstrap bootstrap;
+    private final String name;
+    private final List<String> messages;
+    private final Bootstrap bootstrap;
     private LoginState state = LoginState.PENDING_CONNECTION;
     private boolean reconnecting  = false;
     private boolean lowMem = true;
     private ISAACCipher encrypter, decrypter;
+    private int messageIdx;
 
-    public BotClientHandler317(String name, Bootstrap bootstrap) {
+    public BotClientHandler317(String name, List<String> messages, Bootstrap bootstrap) {
         this.name = name;
+        this.messages = messages;
         this.bootstrap = bootstrap;
     }
 
@@ -134,6 +138,11 @@ public class BotClientHandler317 extends ChannelInboundHandlerAdapter {
                 }
             }
         }
+
+        if (getState() == LoginState.CONNECTED && !messages.isEmpty()) {
+            ctx.writeAndFlush(chatPacket(messages.get(messageIdx)));
+            messageIdx = (messageIdx + 1) % messages.size();
+        }
         buf.release();
     }
 
@@ -149,19 +158,21 @@ public class BotClientHandler317 extends ChannelInboundHandlerAdapter {
         return buf;
     }
 
-    public ByteBuf chatPacket(int effects, int color, String text) { // does this work
-        int packetSize = 2 + 1 + text.getBytes().length;
-        ByteBuf buf = Unpooled.buffer(1 + packetSize);
+    public ByteBuf chatPacket(String text, int effects, int color) { // does this work - no!
+        ByteBuf msgBuf = Unpooled.buffer(text.length());
+        RsBufferHelper.writeString2(msgBuf, text);
+
+        int bufSize = 4 + msgBuf.writerIndex();
+        ByteBuf buf = Unpooled.buffer(bufSize);
         buf.writeByte(encrypter.getNextKey() + 4);
-        buf.writeByte(packetSize);
+        buf.writeByte(bufSize - 2);
         buf.writeByte(128 - effects);
         buf.writeByte(128 - color);
-        byte[] b = text.getBytes();
 
-        for (int i = b.length - 1; i >= 0; i--) {
-            buf.writeByte(b[i] + 128);
-        }
-        buf.writeByte(10);
+        msgBuf.forEachByteDesc(value -> {
+            buf.writeByte(value + 128);
+            return true;
+        });
         return buf;
     }
 
