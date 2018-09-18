@@ -12,15 +12,16 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         // Parse command-line arguments
         BotClientContext ctx = new BotClientContext();
+        JCommander commander = JCommander.newBuilder()
+                .addObject(ctx)
+                .programName("java -jar rsps-stress-tester.jar")
+                .build();
 
         try {
-            JCommander commander = JCommander.newBuilder()
-                    .addObject(ctx)
-                    .programName("java -jar rsps-stress-tester.jar")
-                    .build();
             commander.parse(args);
         } catch (ParameterException ex) {
             LOGGER.error("Unable to parse command-line arguments: {}", ex.getMessage());
+            commander.usage();
             System.exit(1);
         }
 
