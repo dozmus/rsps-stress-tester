@@ -16,8 +16,10 @@ repositories {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/com.google.inject/guice
+    compile 'com.google.inject:guice:4.2.0'
     // https://mvnrepository.com/artifact/com.beust/jcommander
-    compile group: 'com.beust', name: 'jcommander', version: '1.72'
+    compile 'com.beust:jcommander:1.72'
     // https://mvnrepository.com/artifact/io.netty/netty-all
     compile 'io.netty:netty-all:4.1.29.Final'
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple

@@ -2,6 +2,8 @@ package com.purecs;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,8 +28,8 @@ public class Main {
         }
 
         // Create clients
-        BotClientHive hive = new BotClientHive(ctx.getHost(), ctx.getPort(), ctx.getThreads(), ctx.getMessages(),
-                new DefaultSessionCredentialsGenerator());
+        Injector injector = Guice.createInjector(new BotModule(ctx));
+        BotClientHive hive = injector.getInstance(BotClientHive.class);
         final int chunk = 10;
 
         for (int i = 1; i <= ctx.getNumber(); i++) {

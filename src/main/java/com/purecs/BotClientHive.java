@@ -1,5 +1,7 @@
 package com.purecs;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.purecs.handler.IdleHandler;
 import com.purecs.handler.BotClientHandler317;
 import io.netty.bootstrap.Bootstrap;
@@ -19,7 +21,9 @@ public class BotClientHive {
     private final SessionCredentialsGenerator sessionCredentialsGenerator;
     private int n = 0;
 
-    public BotClientHive(String host, int port, int threads, List<String> messages,
+    @Inject
+    public BotClientHive(@Named("host") String host, @Named("port") int port, @Named("threads") int threads,
+                         @Named("messages") List<String> messages,
                          SessionCredentialsGenerator sessionCredentialsGenerator) {
         this.host = host;
         this.port = port;
