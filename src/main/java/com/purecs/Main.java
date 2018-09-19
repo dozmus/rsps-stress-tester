@@ -26,11 +26,12 @@ public class Main {
         }
 
         // Create clients
-        BotClientHive hive = new BotClientHive(ctx.getHost(), ctx.getPort(), ctx.getThreads(), ctx.getMessages());
+        BotClientHive hive = new BotClientHive(ctx.getHost(), ctx.getPort(), ctx.getThreads(), ctx.getMessages(),
+                new DefaultSessionCredentialsGenerator());
         final int chunk = 10;
 
         for (int i = 1; i <= ctx.getNumber(); i++) {
-            hive.connect("Bot" + i);
+            hive.connect();
 
             if (i % chunk == 0) {
                 Thread.sleep(1000);

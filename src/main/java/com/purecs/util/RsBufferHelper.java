@@ -13,26 +13,26 @@ public final class RsBufferHelper {
         return (val1 << 32) + val2;
     }
 
-    public static void writeString(ByteBuf buf, String name) {
-        for (byte b : name.getBytes()) {
+    public static void writeString(ByteBuf buf, String text) {
+        for (byte b : text.getBytes()) {
             buf.writeByte(b);
         }
         buf.writeByte(10);
     }
 
-    public static void writeString2(ByteBuf buf, String s) {
-        if (s.length() > 80) {
-            s = s.substring(0, 80);
+    public static void writeChatString(ByteBuf buf, String text) {
+        if (text.length() > 80) {
+            text = text.substring(0, 80);
         }
-        s = s.toLowerCase();
+        text = text.toLowerCase();
         int i = -1;
 
-        for (int j = 0; j < s.length(); j++) {
-            char c = s.charAt(j);
+        for (int j = 0; j < text.length(); j++) {
+            char c = text.charAt(j);
             int k = 0;
 
-            for (int l = 0; l < validChars.length; l++) {
-                if (c != validChars[l]) {
+            for (int l = 0; l < VALID_CHARS.length; l++) {
+                if (c != VALID_CHARS[l]) {
                     continue;
                 }
                 k = l;
@@ -63,7 +63,7 @@ public final class RsBufferHelper {
         }
     }
 
-    private static final char[] validChars = {
+    private static final char[] VALID_CHARS = {
             ' ', 'e', 't', 'a', 'o', 'i', 'h', 'n', 's', 'r',
             'd', 'l', 'u', 'm', 'w', 'c', 'y', 'f', 'g', 'p',
             'b', 'v', 'k', 'x', 'j', 'q', 'z', '0', '1', '2',

@@ -16,18 +16,22 @@ import java.util.List;
 public class BotClientHandler317 extends BotClientHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BotClientHandler317.class);
-    private static final int RESPONSE_OK = 2;
+    private static final int HANDSHAKE_RESPONSE_OK = 2;
     private final String name;
     private final List<String> messages;
     private final Bootstrap bootstrap;
+    private final String password;
+    private final int uid;
     private LoginState state = LoginState.PENDING_CONNECTION;
     private boolean reconnecting  = false;
     private boolean lowMem = true;
     private ISAACCipher encrypter, decrypter;
     private int messageIdx;
 
-    public BotClientHandler317(String name, List<String> messages, Bootstrap bootstrap) {
+    public BotClientHandler317(String name, String password, int uid, List<String> messages, Bootstrap bootstrap) {
         this.name = name;
+        this.password = password;
+        this.uid = uid;
         this.messages = messages;
         this.bootstrap = bootstrap;
     }
@@ -93,9 +97,9 @@ public class BotClientHandler317 extends BotClientHandler {
                 for (int i : ai) {
                     response.writeInt(i);
                 }
-                response.writeInt(27738603); // uid (generated from cache in this client)
-                RsBufferHelper.writeString(response, name); // name
-                RsBufferHelper.writeString(response, "test123"); // pwd
+                response.writeInt(uid); // uid (generated from cache in this client)
+                RsBufferHelper.writeString(response, name);
+                RsBufferHelper.writeString(response, password);
                 // TODO generate keys?
 
                 ByteBuf response2 = Unpooled.buffer();
@@ -128,7 +132,7 @@ public class BotClientHandler317 extends BotClientHandler {
             if (buf.readableBytes() > 3) {
                 int resp = buf.readByte();
 
-                if (resp == RESPONSE_OK) {
+                if (resp == HANDSHAKE_RESPONSE_OK) {
                     int privilege = buf.readByte();
                     boolean flagged = buf.readByte() == 1;
                     // other flags and setup IDK shit
@@ -160,7 +164,7 @@ public class BotClientHandler317 extends BotClientHandler {
 
     public ByteBuf chatPacket(String text, int effects, int color) { // does this work - no!
         ByteBuf msgBuf = Unpooled.buffer(text.length());
-        RsBufferHelper.writeString2(msgBuf, text);
+        RsBufferHelper.writeChatString(msgBuf, text);
 
         int bufSize = 4 + msgBuf.writerIndex();
         ByteBuf buf = Unpooled.buffer(bufSize);
