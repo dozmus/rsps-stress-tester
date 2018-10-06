@@ -1,11 +1,11 @@
-package com.purecs.handler;
+package com.dozmus.handler.task;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -13,7 +13,8 @@ public final class ReconnectTask implements Runnable, ChannelFutureListener {
 
     // Source: https://stackoverflow.com/a/36422221
 
-    private static final Random RANDOM = new Random();
+    private static final int MINIMUM_DELAY_MS = 1_000;
+    private static final int MAXIMUM_DELAY_MS = 5_000;
     private final Bootstrap bootstrap;
     private final Channel previous;
 
@@ -30,7 +31,8 @@ public final class ReconnectTask implements Runnable, ChannelFutureListener {
 
     public void operationComplete(ChannelFuture future) {
         if (!future.isSuccess()) {
-            previous.eventLoop().schedule(this, 1000 + RANDOM.nextInt(1000), MILLISECONDS);
+            int delay = ThreadLocalRandom.current().nextInt(MINIMUM_DELAY_MS, MAXIMUM_DELAY_MS);
+            previous.eventLoop().schedule(this, delay, MILLISECONDS);
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.purecs;
+package com.dozmus;
 
 import com.beust.jcommander.Parameter;
 

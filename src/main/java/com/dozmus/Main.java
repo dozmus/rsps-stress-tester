@@ -1,4 +1,4 @@
-package com.purecs;
+package com.dozmus;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -27,13 +27,19 @@ public class Main {
             System.exit(1);
         }
 
-        // Create clients
+        // Create hive manager
         Injector injector = Guice.createInjector(new BotModule(ctx));
-        BotClientHive hive = injector.getInstance(BotClientHive.class);
+        BotClientHiveManager hive = injector.getInstance(BotClientHiveManager.class);
+
+        // Connect clients
         final int chunk = 10;
 
         for (int i = 1; i <= ctx.getNumber(); i++) {
-            hive.connect();
+            String username = "Bot" + i;
+            String password = "Password" + i;
+            int uid = 27738603;
+
+            hive.connect(username, password, uid);
 
             if (i % chunk == 0) {
                 Thread.sleep(1000);

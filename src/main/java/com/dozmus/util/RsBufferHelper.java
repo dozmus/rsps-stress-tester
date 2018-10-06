@@ -1,4 +1,4 @@
-package com.purecs.util;
+package com.dozmus.util;
 
 import io.netty.buffer.ByteBuf;
 

@@ -1,10 +1,12 @@
 rsps-stress-tester
 ========
 
-A stress tester for runescape private servers. This intentionally does not come with support for proxies,
-distribution of work, or tor, because it is not intended for malicious activity.
+A stress tester for runescape private servers.
 
-It can idle at a spot, or also type chat messages.
+This intentionally does not come with support for proxies, distribution of work,
+or tor, because it is not intended for malicious activity.
+
+It can idle at a spot, and also type chat messages.
 
 You can specify messages to type using `-m hello1,hello2`.
 If they contain spaces you can use `-m "hello world","hello world 2"`.

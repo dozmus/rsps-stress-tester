@@ -1,4 +1,4 @@
-package com.purecs.handler;
+package com.dozmus.handler;
 
 import io.netty.handler.timeout.IdleStateHandler;
 
