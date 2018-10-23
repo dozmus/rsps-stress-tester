@@ -1,6 +1,6 @@
 package com.dozmus;
 
-import com.dozmus.codec.ByteToMessageEncoder;
+import com.dozmus.codec.MessageToByteEncoder;
 import com.dozmus.codec.ContextualByteToMessageDecoder;
 import com.dozmus.codec.decoder.LoginDecoder;
 import com.dozmus.codec.encoder.ChannelInitResponseEncoder;
@@ -16,30 +16,30 @@ import java.util.List;
 
 public class BotModule extends AbstractModule {
 
-    private final BotClientContext ctx;
+    private final ProgramArgs args;
 
-    public BotModule(BotClientContext ctx) {
-        this.ctx = ctx;
+    public BotModule(ProgramArgs args) {
+        this.args = args;
     }
 
     @Override
     protected void configure() {
         bind(String.class)
                 .annotatedWith(Names.named("host"))
-                .toInstance(ctx.getHost());
+                .toInstance(args.getHost());
         bind(Integer.class)
                 .annotatedWith(Names.named("port"))
-                .toInstance(ctx.getPort());
+                .toInstance(args.getPort());
         bind(Integer.class)
                 .annotatedWith(Names.named("threads"))
-                .toInstance(ctx.getThreads());
+                .toInstance(args.getThreads());
         bind(new TypeLiteral<List<String>>() {})
                 .annotatedWith(Names.named("messages"))
-                .toInstance(ctx.getMessages());
+                .toInstance(args.getMessages());
 
         // Encoders
-        Multibinder<ByteToMessageEncoder> encoderBinder = Multibinder.newSetBinder(binder(),
-                ByteToMessageEncoder.class);
+        Multibinder<MessageToByteEncoder> encoderBinder = Multibinder.newSetBinder(binder(),
+                MessageToByteEncoder.class);
         encoderBinder.addBinding().to(ChannelInitResponseEncoder.class);
         encoderBinder.addBinding().to(ClientInitMessageEncoder.class);
         encoderBinder.addBinding().to(IdleMessageEncoder.class);

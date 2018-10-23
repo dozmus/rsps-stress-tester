@@ -1,13 +1,13 @@
 package com.dozmus.codec.encoder;
 
-import com.dozmus.codec.ByteToMessageEncoder;
+import com.dozmus.codec.MessageToByteEncoder;
 import com.dozmus.message.Message;
 import com.dozmus.message.out.IdleMessage;
 import com.runescape.ISAACCipher;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 
-public class IdleMessageEncoder implements ByteToMessageEncoder {
+public class IdleMessageEncoder implements MessageToByteEncoder {
 
     @Override
     public ByteBuf encode(ByteBufAllocator alloc, ISAACCipher encrypter, Message msg) {

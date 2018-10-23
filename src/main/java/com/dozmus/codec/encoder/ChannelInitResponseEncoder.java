@@ -1,6 +1,6 @@
 package com.dozmus.codec.encoder;
 
-import com.dozmus.codec.ByteToMessageEncoder;
+import com.dozmus.codec.MessageToByteEncoder;
 import com.dozmus.message.Message;
 import com.dozmus.message.out.ChannelInitResponseMessage;
 import com.dozmus.util.RsBufferHelper;
@@ -8,7 +8,7 @@ import com.runescape.ISAACCipher;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 
-public class ChannelInitResponseEncoder implements ByteToMessageEncoder {
+public class ChannelInitResponseEncoder implements MessageToByteEncoder {
 
     @Override
     public ByteBuf encode(ByteBufAllocator alloc, ISAACCipher encrypter, Message in) {

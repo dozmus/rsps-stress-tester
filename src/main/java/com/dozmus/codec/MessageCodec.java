@@ -9,13 +9,13 @@ import io.netty.handler.codec.ByteToMessageCodec;
 import java.util.List;
 import java.util.Set;
 
-public class RSMessageCodec extends ByteToMessageCodec<Message> {
+public class MessageCodec extends ByteToMessageCodec<Message> {
 
-    private final Set<ByteToMessageEncoder> encoders;
+    private final Set<MessageToByteEncoder> encoders;
     private final Set<ContextualByteToMessageDecoder> decoders;
     private final Session session;
 
-    public RSMessageCodec(Set<ByteToMessageEncoder> encoders, Set<ContextualByteToMessageDecoder> decoders,
+    public MessageCodec(Set<MessageToByteEncoder> encoders, Set<ContextualByteToMessageDecoder> decoders,
             Session session) {
         this.encoders = encoders;
         this.decoders = decoders;
@@ -25,7 +25,7 @@ public class RSMessageCodec extends ByteToMessageCodec<Message> {
     @Override
     protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf out) throws Exception {
         try {
-            for (ByteToMessageEncoder encoder : encoders) {
+            for (MessageToByteEncoder encoder : encoders) {
                 if (encoder.accepts(msg)) {
                     out.writeBytes(encoder.encode(ctx.alloc(), session.getEncrypter(), msg));
                     ctx.writeAndFlush(out);
@@ -46,17 +46,5 @@ public class RSMessageCodec extends ByteToMessageCodec<Message> {
                 return;
             }
         }
-    }
-
-    public Set<ByteToMessageEncoder> getEncoders() {
-        return encoders;
-    }
-
-    public Set<ContextualByteToMessageDecoder> getDecoders() {
-        return decoders;
-    }
-
-    public Session getSession() {
-        return session;
     }
 }

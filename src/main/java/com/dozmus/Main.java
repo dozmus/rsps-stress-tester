@@ -13,7 +13,7 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException {
         // Parse command-line arguments
-        BotClientContext ctx = new BotClientContext();
+        ProgramArgs ctx = new ProgramArgs();
         JCommander commander = JCommander.newBuilder()
                 .addObject(ctx)
                 .programName("java -jar rsps-stress-tester.jar")
@@ -29,7 +29,7 @@ public class Main {
 
         // Create hive manager
         Injector injector = Guice.createInjector(new BotModule(ctx));
-        BotClientHiveManager hive = injector.getInstance(BotClientHiveManager.class);
+        BotHive hive = injector.getInstance(BotHive.class);
 
         // Connect clients
         final int chunk = 10;

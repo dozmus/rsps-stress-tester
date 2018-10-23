@@ -5,7 +5,7 @@ import com.beust.jcommander.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class BotClientContext {
+public final class ProgramArgs {
 
     @Parameter(names = {"--host", "-h"}, description = "Server hostname")
     private String host = "127.0.0.1";

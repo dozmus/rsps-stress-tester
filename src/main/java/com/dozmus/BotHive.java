@@ -11,7 +11,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.util.List;
 
-public class BotClientHiveManager {
+public class BotHive {
 
     private final Bootstrap bootstrap = new Bootstrap();
     private final String host;
@@ -20,7 +20,7 @@ public class BotClientHiveManager {
     private BotChannelInitializerFactory factory;
 
     @Inject
-    public BotClientHiveManager(@Named("host") String host, @Named("port") int port, @Named("threads") int threads,
+    public BotHive(@Named("host") String host, @Named("port") int port, @Named("threads") int threads,
                          @Named("messages") List<String> messages, BotChannelInitializerFactory factory) {
         this.host = host;
         this.port = port;

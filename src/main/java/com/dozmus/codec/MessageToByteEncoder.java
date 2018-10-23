@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 import com.dozmus.message.Message;
 import io.netty.buffer.ByteBufAllocator;
 
-public interface ByteToMessageEncoder {
+public interface MessageToByteEncoder {
 
     ByteBuf encode(ByteBufAllocator alloc, ISAACCipher encrypter, Message msg) throws Exception;
 
