@@ -7,6 +7,10 @@ import com.dozmus.codec.encoder.ChannelInitResponseEncoder;
 import com.dozmus.codec.encoder.ChatMessageEncoder;
 import com.dozmus.codec.encoder.ClientInitMessageEncoder;
 import com.dozmus.codec.encoder.IdleMessageEncoder;
+import com.dozmus.handler.MessageHandler;
+import com.dozmus.handler.impl.ChannelInitMessageHandler;
+import com.dozmus.handler.impl.JunkMessageHandler;
+import com.dozmus.handler.impl.LoginResponseMessageHandler;
 import com.google.inject.AbstractModule;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.Multibinder;
@@ -49,5 +53,11 @@ public class BotModule extends AbstractModule {
         Multibinder<ContextualByteToMessageDecoder> decoderBinder = Multibinder.newSetBinder(binder(),
                 ContextualByteToMessageDecoder.class);
         decoderBinder.addBinding().to(LoginDecoder.class);
+
+        // Handlers
+        Multibinder<MessageHandler> handlerBinder = Multibinder.newSetBinder(binder(), MessageHandler.class);
+        handlerBinder.addBinding().to(JunkMessageHandler.class);
+        handlerBinder.addBinding().to(ChannelInitMessageHandler.class);
+        handlerBinder.addBinding().to(LoginResponseMessageHandler.class);
     }
 }

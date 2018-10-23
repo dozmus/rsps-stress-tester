@@ -1,34 +1,33 @@
 package com.dozmus.handler;
 
-import com.dozmus.codec.decoder.LoginDecoder;
 import com.dozmus.handler.task.ReconnectTask;
-import com.dozmus.message.in.ChannelInitMessage;
-import com.dozmus.message.in.LoginResponseMessage;
-import com.dozmus.message.in.JunkMessage;
-import com.dozmus.message.out.ChannelInitResponseMessage;
+import com.dozmus.message.Message;
 import com.dozmus.message.out.ChatMessage;
 import com.dozmus.message.out.ClientInitMessage;
 import com.dozmus.message.out.IdleMessage;
 import com.dozmus.session.LoginState;
 import com.dozmus.session.Session;
-import com.dozmus.util.ArrayHelper;
-import com.runescape.ISAACCipher;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BotClientHandler extends ChannelInboundHandlerAdapter {
+import java.util.Set;
+
+public class BotClientHandler extends SimpleChannelInboundHandler<Message> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BotClientHandler.class);
     private final Session session;
+    private final Set<MessageHandler> handlers;
     private int messageIdx;
 
-    public BotClientHandler(Session session) {
+    public BotClientHandler(Session session, Set<MessageHandler> handlers) {
         this.session = session;
+        this.handlers = handlers;
     }
 
+    @Override
     public void channelActive(ChannelHandlerContext ctx) {
         LOGGER.info("{}: Connection opened.", session.getUsername());
 
@@ -39,6 +38,7 @@ public class BotClientHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         LOGGER.info("{}: Connection lost.", session.getUsername());
         session.setState(LoginState.PENDING_CONNECTION);
@@ -48,53 +48,17 @@ public class BotClientHandler extends ChannelInboundHandlerAdapter {
         reconnect.run();
     }
 
-    public void channelRead(ChannelHandlerContext ctx, Object in) {
-        // TODO we would use observer, or pub-sub, if we want to start doing interesting things
-        if (in instanceof JunkMessage) {
-            LOGGER.debug("{}: Received junk message.", session.getUsername());
-            session.setState(LoginState.WAITING_FOR_RESPONSE_CODE);
-        }
-
-        if (in instanceof ChannelInitMessage) {
-            ChannelInitMessage msg = (ChannelInitMessage) in;
-
-            if (msg.getResponseCode() != 0) {
-                LOGGER.info("{}: Bad response code: {}", session.getUsername(), msg.getResponseCode());
-                session.setState(LoginState.DISCONNECTED);
-                return;
-            } else {
-                LOGGER.debug("{}: Response code: {}", session.getUsername(), msg.getResponseCode());
-            }
-
-            // Generate csk/ssk key-pair
-            int encryptKeys[] = new int[4];
-            encryptKeys[0] = (int) (Math.random() * 99999999D);
-            encryptKeys[1] = (int) (Math.random() * 99999999D);
-            encryptKeys[2] = (int) (msg.getServerSessionKey() >> 32);
-            encryptKeys[3] = (int) msg.getServerSessionKey();
-
-            // Seed encrypter/decrypter
-            session.setEncrypter(new ISAACCipher(encryptKeys));
-            int[] decryptKeys = ArrayHelper.incrementValues(encryptKeys, 50);
-            session.setDecrypter(new ISAACCipher(decryptKeys));
-
-            ctx.write(new ChannelInitResponseMessage(encryptKeys, session.getUsername(),
-                    session.getPassword(), session.getUid(), session.isReconnecting(), session.isLowMem()));
-            session.setState(LoginState.WAITING_FOR_LOGIN_RESPONSE);
-        }
-
-        if (in instanceof LoginResponseMessage) {
-            LoginResponseMessage msg = (LoginResponseMessage) in;
-            LOGGER.info("{}: Response code: {}", session.getUsername(), msg.getResponseCode());
-
-            if (msg.getResponseCode() == LoginDecoder.HANDSHAKE_RESPONSE_OK) {
-                session.setState(LoginState.CONNECTED);
-            } else {
-                session.setState(LoginState.DISCONNECTED);
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, Message msg) {
+        for (MessageHandler handler : handlers) {
+            if (handler.accepts(msg)) {
+                handler.handle(ctx, session, msg);
+                break;
             }
         }
     }
 
+    @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
         if (evt instanceof IdleStateEvent && session.getState() == LoginState.CONNECTED) {
             ctx.write(new IdleMessage());
